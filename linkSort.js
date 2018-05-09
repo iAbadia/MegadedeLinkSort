@@ -7,26 +7,47 @@ function createElementFromHTML(htmlString) {
     return div.firstChild;
 }
 
-// Get online links
-var online = document.getElementById('online');
-var onlineLinks = online.getElementsByTagName('a');
+// Type must be 'online' or 'download'
+function sortLinks(type) {
+    // Get links
+    var linksContainer = document.getElementById(type);
+    var links = linksContainer.getElementsByTagName('a');
 
-// Insert new section at the beginning
-var st = online.getElementsByTagName('h4')
-var h = document.createElement("H4");
-var t = document.createTextNode("Sorted Hosts");
-h.appendChild(t);
-online.insertBefore(h, st[0]);
+    // Insert new section at the beginning
+    var st = linksContainer.getElementsByTagName('h4')
+    var h = document.createElement("H4");
+    h.id = 'sorted-links';
+    var t = document.createTextNode("Sorted Hosts");
+    h.appendChild(t);
+    linksContainer.insertBefore(h, st[0]);
 
-// Sort and keep HD quality online (class: quality-2)
-var onlineSortArray = []
-for (var i = 0; i < onlineLinks.length; i += 1) {
-    if (onlineLinks[i].className.includes('quality-2')) {
-        onlineSortArray.push(createElementFromHTML(onlineLinks[i].outerHTML));
+    // Sort and keep HD quality online (class: quality-2)
+    var linkSortArray = []
+    for (var i = 0; i < links.length; i += 1) {
+        if (links[i].className.includes('quality-2')) {
+            linkSortArray.push(createElementFromHTML(links[i].outerHTML));
+        }
+    }
+
+    // Insert links
+    for (var i = 0; i < linkSortArray.length; i += 1) {
+        linksContainer.insertBefore(linkSortArray[i], st[1]);
     }
 }
 
-// Insert links
-for (var i = 0; i < onlineSortArray.length; i += 1) {
-    online.insertBefore(onlineSortArray[i], st[1]);
+function checkLinks() {
+    var popupaportes = document.getElementsByClassName('popup-aportes');
+    // Check if links loaded
+    if(popupaportes.length != 0) {
+        // Check if already sorted
+        if(document.getElementById('sorted-links') == null){
+            // Sort links
+            sortLinks('online');
+            sortLinks('download');
+        }        
+    }
+    setTimeout(checkLinks, 1000);
 }
+
+// Set Timeout function to check if links are displayed
+setTimeout(checkLinks, 1000);
