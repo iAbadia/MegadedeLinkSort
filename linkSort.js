@@ -13,6 +13,11 @@ function sortLinks(type) {
     var linksContainer = document.getElementById(type);
     var links = linksContainer.getElementsByTagName('a');
 
+    // Check for no links
+    if(links.length == 0) {
+        return;
+    }
+
     // Insert new section at the beginning
     var st = linksContainer.getElementsByTagName('h4')
     var h = document.createElement("H4");
