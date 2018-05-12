@@ -1,7 +1,8 @@
 {
     "manifest_version": 2,
 
-    "name": "PLS",
+    "name": "Plusdede Link Sort",
+    "short_name": "PLS",
     "description": "Plusdede Link Sorter",
     "version": "0.2",
 

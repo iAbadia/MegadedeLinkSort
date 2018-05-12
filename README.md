@@ -2,7 +2,7 @@
 Sort Plusdede links with this awesome Chrome extension!
 
 <p align="center">
-  <img height="500px" src="sample.jpg" alt="This is how it looks!"/>
+  <img height="500px" src="media/sample.jpg" alt="This is how it looks!"/>
 </p>
 
 ## Why?
