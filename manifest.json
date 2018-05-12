@@ -3,7 +3,7 @@
 
     "name": "PLS",
     "description": "Plusdede Link Sorter",
-    "version": "0.1",
+    "version": "0.2",
 
     "browser_action": {
         "default_icon": "icon.png",
