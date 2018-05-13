@@ -45,16 +45,36 @@
             color: black;
             border: 2px solid #555555;
         }
+
+        .opts {
+            display: block;
+            width: max-content;
+        }
     </style>
 
     <script type="text/javascript" src="popup.js"></script>
 </head>
 
 <body>
-    <h1>Quality</h1>
-    <button class="button" id="low-button">Low</button>
-    <button class="button" id="high-button">High</button>
-    <button class="button" id="hd-button">HD</button>
+    <div class="opts">
+        <h2>Quality</h2>
+        <button class="button" id="qua-low-button">Low</button>
+        <button class="button" id="qua-high-button">High</button>
+        <button class="button" id="qua-hd-button">HD</button>
+    </div>
+    <div class="opts">
+        <h2>Lang</h2>
+        <button class="button" id="lang-any-button">ANY</button>
+        <button class="button" id="lang-esp-button">ESP</button>
+        <button class="button" id="lang-eng-button">ENG</button>
+    </div>
+    <div class="opts">
+        <h2>Subs</h2>
+        <button class="button" id="subs-any-button">ANY</button>
+        <button class="button" id="subs-esp-button">ESP</button>
+        <button class="button" id="subs-eng-button">ENG</button>
+    </div>
+
 </body>
 
 </html>
