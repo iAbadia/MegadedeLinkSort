@@ -7,15 +7,36 @@ function createElementFromHTML(htmlString) {
     return div.firstChild;
 }
 
-// Type must be 'online' or 'download'
+// Map saved lang value to HTML src image name
+function toLang(lang) {
+    switch(lang) {
+        case 'esp':
+            return 'spanish.png';
+            break;
+        case 'eng':
+            return 'english.png';
+            break;
+        case 'lat':
+            return 'latino.png';
+            break;
+        default:
+            return null;
+            break;
+    }
+}
+
+// Type must be 'online' or 'download' (Online/Download link list IDs)
 function sortLinks(type) {
-    // Retrieve selected quality
-    chrome.storage.local.get(['quality'], function (items) {
+    // Retrieve selected quality, lang and subs.
+    chrome.storage.local.get(['quality', 'lang', 'subs'], function (items) {
         linkQuality = items.quality;
+        linkLang = items.lang;
+        linkSubs = items.subs;
 
         // Get links
         var linksContainer = document.getElementById(type);
         var links = linksContainer.getElementsByTagName('a');
+        links = Array.from(links);  // Convert HTMLCollection to JS Array
 
         // Check for no links
         if (links.length == 0) {
@@ -30,17 +51,42 @@ function sortLinks(type) {
         h.appendChild(t);
         linksContainer.insertBefore(h, st[0]);
 
-        // Sort and keep HD quality online (class: quality-2)
-        var linkSortArray = []
+        // Sort by quality
         for (var i = 0; i < links.length; i += 1) {
-            if (links[i].className.includes(linkQuality)) {
-                linkSortArray.push(createElementFromHTML(links[i].outerHTML));
+            if (!links[i].className.includes(linkQuality)) {
+                // Remove from array
+                links.splice(i, 1);
+                i -= 1; // Counter-update index
+            }
+        }
+
+        // Sort by Lang and sub
+        for (var i = 0; i < links.length; i += 1) {
+            if(linkLang != 'any') {
+                // Get flags
+                var langSubsFlags = links[i].getElementsByClassName('language')[0].getElementsByTagName('img');
+
+                // Check for lang
+                if(!langSubsFlags[0].src.includes(toLang(linkLang))) {
+                    links.splice(i, 1);
+                    i -= 1; // Counter-update index (we just altered the array length)
+                    continue;   // Link removed, don't care about subs
+                }
+
+                // Check for subs
+                if(linkSubs != 'any') {
+                    // Remove if sub selected but no subs OR sub selected but not matching lang
+                    if (langSubsFlags.length == 1 || langSubsFlags.length > 1 && !langSubsFlags[1].src.includes(toLang(linkSubs))) {
+                        links.splice(i, 1);
+                        i -= 1; // Counter-update index (we just altered the array length)
+                    }
+                }
             }
         }
 
         // Insert links
-        for (var i = 0; i < linkSortArray.length; i += 1) {
-            linksContainer.insertBefore(linkSortArray[i], st[1]);
+        for (var i = 0; i < links.length; i += 1) {
+            linksContainer.insertBefore(createElementFromHTML(links[i].outerHTML), st[1]);
         }
     });
 }
@@ -56,8 +102,7 @@ function checkLinks() {
             sortLinks('download');
         }
     }
-    setTimeout(checkLinks, 1000);
 }
 
-// Set Timeout function to check if links are displayed
-setTimeout(checkLinks, 1000);
+// Start checkLinks loop
+setInterval(checkLinks, 2000);
