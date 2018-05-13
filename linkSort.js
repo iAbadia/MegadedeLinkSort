@@ -9,7 +9,7 @@ function createElementFromHTML(htmlString) {
 
 // Map saved lang value to HTML src image name
 function toLang(lang) {
-    switch(lang) {
+    switch (lang) {
         case 'esp':
             return 'spanish.png';
             break;
@@ -35,7 +35,7 @@ function sortLinks(type) {
 
         // Get links
         var linksContainer = document.getElementById(type);
-        var links = linksContainer.getElementsByTagName('a');
+        var links = linksContainer.getElementsByClassName('aporte');
         links = Array.from(links);  // Convert HTMLCollection to JS Array
 
         // Check for no links
@@ -52,41 +52,51 @@ function sortLinks(type) {
         linksContainer.insertBefore(h, st[0]);
 
         // Sort by quality
-        for (var i = 0; i < links.length; i += 1) {
-            if (!links[i].className.includes(linkQuality)) {
-                // Remove from array
-                links.splice(i, 1);
-                i -= 1; // Counter-update index
+        if (linkQuality != 'any') {
+            for (var i = 0; i < links.length; i += 1) {
+                if (!links[i].className.includes(linkQuality)) {
+                    // Remove from array
+                    links.splice(i, 1);
+                    i -= 1; // Counter-update index
+                }
             }
         }
 
         // Sort by Lang and sub
+        console.log(links);
         for (var i = 0; i < links.length; i += 1) {
-            if(linkLang != 'any') {
-                // Get flags
-                var langSubsFlags = links[i].getElementsByClassName('language')[0].getElementsByTagName('img');
+            // Get flags
+            console.log(links[i].getElementsByClassName('language'));
+            console.log(i);
+            var langSubsFlags = links[i].getElementsByClassName('language')[0].getElementsByTagName('img');
 
-                // Check for lang
-                if(!langSubsFlags[0].src.includes(toLang(linkLang))) {
+            // Check lang
+            if (linkLang != 'any') {
+                if (!langSubsFlags[0].src.includes(toLang(linkLang))) {
                     links.splice(i, 1);
                     i -= 1; // Counter-update index (we just altered the array length)
                     continue;   // Link removed, don't care about subs
                 }
+            }
 
-                // Check for subs
-                if(linkSubs != 'any') {
-                    // Remove if sub selected but no subs OR sub selected but not matching lang
-                    if (langSubsFlags.length == 1 || langSubsFlags.length > 1 && !langSubsFlags[1].src.includes(toLang(linkSubs))) {
-                        links.splice(i, 1);
-                        i -= 1; // Counter-update index (we just altered the array length)
-                    }
+            // Check subs
+            if (linkSubs != 'any') {
+                // Remove if no subs but some sub selected OR sub selected but not matching lang
+                if ((langSubsFlags.length == 1 && linkSubs != 'none') ||
+                    (langSubsFlags.length > 1 && !langSubsFlags[1].src.includes(toLang(linkSubs)))) {
+                    links.splice(i, 1);
+                    i -= 1; // Counter-update index (we just altered the array length)
                 }
             }
         }
 
         // Insert links
-        for (var i = 0; i < links.length; i += 1) {
-            linksContainer.insertBefore(createElementFromHTML(links[i].outerHTML), st[1]);
+        if (links.length > 0) {
+            for (var i = 0; i < links.length; i += 1) {
+                linksContainer.insertBefore(createElementFromHTML(links[i].outerHTML), st[1]);
+            }
+        } else {
+            linksContainer.insertBefore(createElementFromHTML('<p> No links matching criteria </p>'), st[1]);
         }
     });
 }
@@ -105,4 +115,4 @@ function checkLinks() {
 }
 
 // Start checkLinks loop
-setInterval(checkLinks, 2000);
+setInterval(checkLinks, 1000);

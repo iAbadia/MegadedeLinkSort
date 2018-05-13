@@ -1,21 +1,25 @@
 {
     "manifest_version": 2,
-
     "name": "Plusdede Link Sort",
     "short_name": "PLS",
     "description": "Plusdede Link Sorter",
-    "version": "0.3",
-
+    "version": "0.4",
     "browser_action": {
         "default_icon": "icon.png",
         "default_title": "PLS",
         "default_popup": "popup.html"
     },
-    "content_scripts": [{
-        "css": [],
-        "js": ["linkSort.js"],
-        "matches": ["https://www.plusdede.com/*"]
-    }],
+    "content_scripts": [
+        {
+            "css": [],
+            "js": [
+                "linkSort.js"
+            ],
+            "matches": [
+                "https://www.plusdede.com/*"
+            ]
+        }
+    ],
     "permissions": [
         "activeTab",
         "tabs",

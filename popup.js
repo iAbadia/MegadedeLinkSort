@@ -24,6 +24,7 @@ function changeSubs(subs) {
 
 // Reset buttons style and set selected
 function resetButtonsStyle() {
+    document.getElementById('qua-any-button').className = "button";
     document.getElementById('qua-low-button').className = "button";
     document.getElementById('qua-high-button').className = "button";
     document.getElementById('qua-hd-button').className = "button";
@@ -31,10 +32,12 @@ function resetButtonsStyle() {
     document.getElementById('lang-any-button').className = "button";
     document.getElementById('lang-esp-button').className = "button";
     document.getElementById('lang-eng-button').className = "button";
+    document.getElementById('lang-lat-button').className = "button";
 
     document.getElementById('subs-any-button').className = "button";
     document.getElementById('subs-esp-button').className = "button";
     document.getElementById('subs-eng-button').className = "button";
+    document.getElementById('subs-none-button').className = "button";
 
     initButtons();
 }
@@ -44,6 +47,9 @@ function initButtons() {
     // Retrieve quality and set button style
     chrome.storage.local.get(['quality'], function (items) {
         switch (items.quality) {
+            case 'any':
+                document.getElementById('qua-any-button').classList.add("button-selected");
+                break;
             case 'quality-0':
                 document.getElementById('qua-low-button').classList.add("button-selected");
                 break;
@@ -70,6 +76,9 @@ function initButtons() {
             case 'eng':
                 document.getElementById('lang-eng-button').classList.add("button-selected");
                 break;
+            case 'lat':
+                document.getElementById('lang-lat-button').classList.add("button-selected");
+                break;
             default:
                 break;
         }
@@ -87,6 +96,9 @@ function initButtons() {
             case 'eng':
                 document.getElementById('subs-eng-button').classList.add("button-selected");
                 break;
+            case 'none':
+                document.getElementById('subs-none-button').classList.add("button-selected");
+                break;
             default:
                 break;
         }
@@ -95,6 +107,7 @@ function initButtons() {
 
 // Set onclik listeners
 document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('qua-any-button').addEventListener("click", function () { changeQuality("any") });
     document.getElementById('qua-low-button').addEventListener("click", function () { changeQuality("quality-0") });
     document.getElementById('qua-high-button').addEventListener("click", function () { changeQuality("quality-1") });
     document.getElementById('qua-hd-button').addEventListener("click", function () { changeQuality("quality-2") });
@@ -102,10 +115,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('lang-any-button').addEventListener("click", function () { changeLang("any") });
     document.getElementById('lang-esp-button').addEventListener("click", function () { changeLang("esp") });
     document.getElementById('lang-eng-button').addEventListener("click", function () { changeLang("eng") });
+    document.getElementById('lang-lat-button').addEventListener("click", function () { changeLang("lat") });
 
     document.getElementById('subs-any-button').addEventListener("click", function () { changeSubs("any") });
     document.getElementById('subs-esp-button').addEventListener("click", function () { changeSubs("esp") });
     document.getElementById('subs-eng-button').addEventListener("click", function () { changeSubs("eng") });
+    document.getElementById('subs-none-button').addEventListener("click", function () { changeSubs("none") });
 
     initButtons();
 });
