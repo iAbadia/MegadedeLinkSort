@@ -5,13 +5,18 @@ Sort Plusdede links with this awesome Chrome extension!
   <img height="500px" src="media/sample.jpg" alt="This is how it looks!"/>
 </p>
 
+## What (does this extension do?)
+It sorts the displayed links by quality, language and subtitles.
+
 ## Why?
 Plusded doesn't provide any sorting function. I do.
 
-## What (does this extension do?)
-It sorts the displayed links by quality. As of now, HD quality is hardcoded. Plans for the future include showing an interactive dropdown list for sorting by language, subtitles, quality and user.
-
 ## Install instructions
+
+#### Chrome Store
+* Go to [Chrome Store link](https://chrome.google.com/webstore/detail/plusdede-link-sort/kgenjfcceemhklklbfahkkepmfppkpao)
+* Install
+
 #### Release
 * Go to [realeases](https://github.com/iAbadia/PlusdedeLinkSort/releases)
 * Download newest binary (Yes, that .crx file)
