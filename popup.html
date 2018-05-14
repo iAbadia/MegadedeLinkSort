@@ -2,76 +2,29 @@
 <html>
 
 <head>
-
     <meta charset="UTF-8">
     <title>PLS</title>
-
-    <style>
-        .button {
-            border: none;
-            padding: 16px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            -webkit-transition-duration: 0.4s;
-            /* Safari */
-            transition-duration: 0.4s;
-            cursor: pointer;
-            background-color: white;
-            color: black;
-            border: 2px solid #555555;
-        }
-
-        .button:hover {
-            background-color: #555555;
-            color: white;
-        }
-
-        .button-selected {
-            border: none;
-            padding: 16px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            -webkit-transition-duration: 0.4s;
-            /* Safari */
-            transition-duration: 0.4s;
-            cursor: pointer;
-            background-color: rgb(255, 175, 175);
-            color: black;
-            border: 2px solid #555555;
-        }
-
-        .opts {
-            display: block;
-            width: max-content;
-        }
-    </style>
-
+    <link rel="stylesheet" href="popup.css">
     <script type="text/javascript" src="popup.js"></script>
 </head>
 
 <body>
     <div class="opts">
-        <h2>Quality</h2>
+        <span class="sect-title">Quality</span>
         <button class="button" id="qua-any-button">Any</button>
         <button class="button" id="qua-low-button">Low</button>
         <button class="button" id="qua-high-button">High</button>
         <button class="button" id="qua-hd-button">HD</button>
     </div>
     <div class="opts">
-        <h2>Lang</h2>
+        <span class="sect-title">Lang</span>
         <button class="button" id="lang-any-button">Any</button>
         <button class="button" id="lang-esp-button">Esp</button>
         <button class="button" id="lang-eng-button">Eng</button>
         <button class="button" id="lang-lat-button">Lat</button>
     </div>
     <div class="opts">
-        <h2>Subs</h2>
+        <span class="sect-title">Subs</span>
         <button class="button" id="subs-any-button">Any</button>
         <button class="button" id="subs-esp-button">Esp</button>
         <button class="button" id="subs-eng-button">Eng</button>
