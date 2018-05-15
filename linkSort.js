@@ -102,16 +102,21 @@ function sortLinks(type) {
 }
 
 function checkLinks() {
-    var popupaportes = document.getElementsByClassName('popup-aportes');
-    // Check if links loaded
-    if (popupaportes.length != 0) {
-        // Check if already sorted
-        if (document.getElementById('sorted-links') == null) {
-            // Sort links
-            sortLinks('online');
-            sortLinks('download');
+    // Check if sorting active
+    chrome.storage.local.get(['active'], function (items) {
+        if (items.active == undefined || items.active) {
+            var popupaportes = document.getElementsByClassName('popup-aportes');
+            // Check if links loaded
+            if (popupaportes.length != 0) {
+                // Check if already sorted
+                if (document.getElementById('sorted-links') == null) {
+                    // Sort links
+                    sortLinks('online');
+                    sortLinks('download');
+                }
+            }
         }
-    }
+    });
 }
 
 // Start checkLinks loop
