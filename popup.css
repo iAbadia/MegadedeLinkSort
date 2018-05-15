@@ -45,12 +45,83 @@ body {
 .opts {
     display: block;
     width: max-content;
-    padding: 10px;
+    padding: 5px 10px;
+}
+
+.title {
+    display: block;
+    text-align: center;
+    color: #555555;
+    font-size: 2em;
+    font-weight: bold;
+    margin: 10px 0 0 0;
 }
 
 .sect-title {
-    color: #3F3F3A;
+    overflow: hidden;
+    text-align: center;
+    color: #8C969D;
     font-size: 1em;
     font-weight: 400;
     display: block;
+    margin: 0 2em;
+}
+
+.sect-title:before,
+.sect-title:after {
+    background-color: #c8d0d6;
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+}
+.sect-title:before {
+    right: 0.5em;
+    margin-left: -50%;
+}
+.sect-title:after {
+    left: 0.5em;
+    margin-right: -50%;
+}
+
+.center-div {
+    text-align: center;
+}
+
+.onoffswitch {
+    margin: 20px;
+    position: relative;
+    display: inline-block;
+    width: 90px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    height: 30px; padding: 0; line-height: 30px;
+    border: 2px solid #999999; border-radius: 4px;
+    background-color: #EEEEEE;
+    transition: background-color 0.3s ease-in;
+}
+.onoffswitch-label:before {
+    content: "";
+    display: block; width: 30px; margin: 0px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 58px;
+    border: 2px solid #999999; border-radius: 4px;
+    transition: all 0.3s ease-in 0s; 
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label {
+    background-color: #af0806;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label, .onoffswitch-checkbox:checked + .onoffswitch-label:before {
+   border-color: #910101;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label:before {
+    right: 0px; 
 }
