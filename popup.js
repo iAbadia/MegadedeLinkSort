@@ -1,7 +1,23 @@
+// Update active
+function changeActive() {
+    chrome.storage.local.get(['active'], function (items) {
+        // By default set active
+        var active = items.active == undefined ? false : items.active;
+        console.log(active);
+
+        chrome.storage.local.set({ 'active': !active }, function (items) {
+            // Change switch state
+            document.getElementById('myonoffswitch').checked = !active;
+            // Update buttons
+            resetButtonsStyle();
+        });
+    });
+}
+
 // Update quality
 function changeQuality(quality) {
     chrome.storage.local.set({ 'quality': quality }, function (items) {
-        // Update selected button
+        // Update buttons
         resetButtonsStyle();
     });
 };
@@ -9,7 +25,7 @@ function changeQuality(quality) {
 // Update language
 function changeLang(language) {
     chrome.storage.local.set({ 'lang': language }, function (items) {
-        // Update selected button
+        // Update buttons
         resetButtonsStyle();
     });
 };
@@ -17,7 +33,7 @@ function changeLang(language) {
 // Update subs
 function changeSubs(subs) {
     chrome.storage.local.set({ 'subs': subs }, function (items) {
-        // Update selected button
+        // Update buttons
         resetButtonsStyle();
     });
 };
@@ -44,69 +60,83 @@ function resetButtonsStyle() {
 
 // Initialisation
 function initButtons() {
-    // Retrieve quality and set button style
-    chrome.storage.local.get(['quality'], function (items) {
-        switch (items.quality) {
-            case 'any':
-                document.getElementById('qua-any-button').classList.add("button-selected");
-                break;
-            case 'quality-0':
-                document.getElementById('qua-low-button').classList.add("button-selected");
-                break;
-            case 'quality-1':
-                document.getElementById('qua-high-button').classList.add("button-selected");
-                break;
-            case 'quality-2':
-                document.getElementById('qua-hd-button').classList.add("button-selected");
-                break;
-            default:
-                break;
+    // Retrieve active state
+    chrome.storage.local.get(['active'], function (it) {
+        // If its not defined, changeActive will set it to true
+        if (it.active == undefined) {
+            changeActive();
+            it.active = true;
         }
-    });
 
-    // Retrieve lang and set button style
-    chrome.storage.local.get(['lang'], function (items) {
-        switch (items.lang) {
-            case 'any':
-                document.getElementById('lang-any-button').classList.add("button-selected");
-                break;
-            case 'esp':
-                document.getElementById('lang-esp-button').classList.add("button-selected");
-                break;
-            case 'eng':
-                document.getElementById('lang-eng-button').classList.add("button-selected");
-                break;
-            case 'lat':
-                document.getElementById('lang-lat-button').classList.add("button-selected");
-                break;
-            default:
-                break;
-        }
-    });
+        // Set state
+        document.getElementById('myonoffswitch').checked = it.active;
 
-    // Retrieve subs and set button style
-    chrome.storage.local.get(['subs'], function (items) {
-        switch (items.subs) {
-            case 'any':
-                document.getElementById('subs-any-button').classList.add("button-selected");
-                break;
-            case 'esp':
-                document.getElementById('subs-esp-button').classList.add("button-selected");
-                break;
-            case 'eng':
-                document.getElementById('subs-eng-button').classList.add("button-selected");
-                break;
-            case 'none':
-                document.getElementById('subs-none-button').classList.add("button-selected");
-                break;
-            default:
-                break;
-        }
+        // Retrieve quality and set button style
+        chrome.storage.local.get(['quality'], function (items) {
+            switch (items.quality) {
+                case 'any':
+                    document.getElementById('qua-any-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                case 'quality-0':
+                    document.getElementById('qua-low-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                case 'quality-1':
+                    document.getElementById('qua-high-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                case 'quality-2':
+                    document.getElementById('qua-hd-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        // Retrieve lang and set button style
+        chrome.storage.local.get(['lang'], function (items) {
+            switch (items.lang) {
+                case 'any':
+                    document.getElementById('lang-any-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                case 'esp':
+                    document.getElementById('lang-esp-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                case 'eng':
+                    document.getElementById('lang-eng-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                case 'lat':
+                    document.getElementById('lang-lat-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        // Retrieve subs and set button style
+        chrome.storage.local.get(['subs'], function (items) {
+            switch (items.subs) {
+                case 'any':
+                    document.getElementById('subs-any-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                case 'esp':
+                    document.getElementById('subs-esp-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                case 'eng':
+                    document.getElementById('subs-eng-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                case 'none':
+                    document.getElementById('subs-none-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
+                    break;
+                default:
+                    break;
+            }
+        });
     });
 }
 
 // Set onclik listeners
 document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('myonoffswitch').addEventListener("click", function () { changeActive() });
+
     document.getElementById('qua-any-button').addEventListener("click", function () { changeQuality("any") });
     document.getElementById('qua-low-button').addEventListener("click", function () { changeQuality("quality-0") });
     document.getElementById('qua-high-button').addEventListener("click", function () { changeQuality("quality-1") });
