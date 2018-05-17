@@ -111,7 +111,9 @@ function sortLinks(type) {
                 linksContainer.insertBefore(createElementFromHTML(links[i].outerHTML), st[1]);
             }
         } else {
-            linksContainer.insertBefore(createElementFromHTML('<p> No links matching criteria </p>'), st[1]);
+            let noLinksWarn = createElementFromHTML('<p> No links matching criteria </p>');
+            noLinksWarn.className = "alert alert-warning";  // Classes from Plusdede's css
+            linksContainer.insertBefore(noLinksWarn, st[1]);
         }
     });
 }
