@@ -60,9 +60,9 @@ function sortLinks(type) {
         titleWrap.appendChild(p);
         var t = document.createTextNode("Sorted Hosts");    // Create inside-text nodes
         var infoTooltip = document.createTextNode("");
-        var tooltipText = document.createTextNode("Hehehehe, got it!");
+        var tooltipText = document.createTextNode("Plusdede Link Sort Extension");
 
-        tooltip.appendChild(tooltipText);             // Insert text into hidden span
+        tooltip.appendChild(tooltipText);                   // Insert text into hidden span
         p.appendChild(infoTooltip);                         // Insert tooltip text into tooltip
         p.appendChild(tooltip);                             // Insert hidden span into tooltip
         h.appendChild(t);                                   // Insert Title text into title

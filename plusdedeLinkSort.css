@@ -6,6 +6,7 @@
 #pls-title-info-tooltip {
     display: inline;
     vertical-align: middle;
+    position: relative;
 }
 
 #pls-title-info-tooltip:before
@@ -34,6 +35,7 @@
     border-color: white;
     text-decoration: none;
 
+    /* Necessary for tooltip */
     visibility: visible;
 }
 
@@ -41,19 +43,33 @@
 /* Tooltip text */
 #pls-title-info-tooltip #pls-title-info-tooltip-text {
     visibility: hidden;
-    width: 120px;
+    margin-left: .5em;
+    height: 1.5em;
+    width: 13.5em;
+    line-height: 1em;
     background-color: #bbbbbb;
     color: white;
     text-align: center;
     padding: 5px 0;
     border-radius: 6px;
- 
-    /* Position the tooltip text - see examples below! */
     position: absolute;
     z-index: 1;
 }
 
-/* Show the tooltip text when you mouse over the tooltip container */
+/* Tooltip arrow */
+#pls-title-info-tooltip #pls-title-info-tooltip-text::after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #bbbbbb transparent transparent;
+}
+
+
+/* Show tooltip text when hovering over container */
 #pls-title-info-tooltip:hover #pls-title-info-tooltip-text {
     visibility: visible;
 }
