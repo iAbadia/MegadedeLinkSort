@@ -44,8 +44,10 @@
 #pls-title-info-tooltip #pls-title-info-tooltip-text {
     visibility: hidden;
     margin-left: .5em;
+    padding-left: .5em !important;
+    padding-right: .5em !important;
     height: 1.5em;
-    width: 13.5em;
+    width: max-content;
     line-height: 1em;
     background-color: #bbbbbb;
     color: white;
