@@ -11,7 +11,9 @@
     },
     "content_scripts": [
         {
-            "css": [],
+            "css": [
+                "plusdedeLinkSort.css"
+            ],
             "js": [
                 "linkSort.js"
             ],
@@ -24,5 +26,6 @@
         "activeTab",
         "tabs",
         "storage"
-    ]
+    ],
+    "web_accessible_resources": ["plusdedeLinkSort.css"]
 }

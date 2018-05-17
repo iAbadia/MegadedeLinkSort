@@ -1,0 +1,59 @@
+#pls-title-wrap {
+    margin: 30px 0 10px;
+}
+
+#pls-title-sorted-links,
+#pls-title-info-tooltip {
+    display: inline;
+    vertical-align: middle;
+}
+
+#pls-title-info-tooltip:before
+{
+    content: '?';
+    display: inline-block;
+    font-weight: bold;
+    text-align: center;
+    width: 1.3em;
+    height: 1.3em;
+    font-size: .8em;
+    line-height: 1.1em;
+    border-radius: .8em;
+    margin-left: 1em;
+    padding: .1em;
+    color: #bbbbbb;
+    background: white;
+    border: 1px solid #bbbbbb;
+    text-decoration: none;
+}
+
+#pls-title-info-tooltip:hover:before
+{
+    color: white;
+    background: #bbbbbb;
+    border-color: white;
+    text-decoration: none;
+
+    visibility: visible;
+}
+
+
+/* Tooltip text */
+#pls-title-info-tooltip #pls-title-info-tooltip-text {
+    visibility: hidden;
+    width: 120px;
+    background-color: #bbbbbb;
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+ 
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+#pls-title-info-tooltip:hover #pls-title-info-tooltip-text {
+    visibility: visible;
+}

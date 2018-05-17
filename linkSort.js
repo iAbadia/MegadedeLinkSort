@@ -44,12 +44,30 @@ function sortLinks(type) {
         }
 
         // Insert new section at the beginning
-        var st = linksContainer.getElementsByTagName('h4')
-        var h = document.createElement("H4");
-        h.id = 'sorted-links';
-        var t = document.createTextNode("Sorted Hosts");
-        h.appendChild(t);
-        linksContainer.insertBefore(h, st[0]);
+        var titleWrap = document.createElement("div");      // Create wrapper for title + tooltip
+        titleWrap.id = "pls-title-wrap";
+        var st = linksContainer.getElementsByTagName('h4')  // Get titles
+
+        var h = document.createElement("H4");               // Create HTML elements
+        var p = document.createElement("p");
+        var tooltip = document.createElement("span");
+
+        h.id = 'pls-title-sorted-links';                    // Assign some IDs
+        p.id = 'pls-title-info-tooltip';
+        tooltip.id = "pls-title-info-tooltip-text";
+
+        titleWrap.appendChild(h);                           // Title + tooltip inside wrapper
+        titleWrap.appendChild(p);
+        var t = document.createTextNode("Sorted Hosts");    // Create inside-text nodes
+        var infoTooltip = document.createTextNode("");
+        var tooltipText = document.createTextNode("Hehehehe, got it!");
+
+        tooltip.appendChild(tooltipText);             // Insert text into hidden span
+        p.appendChild(infoTooltip);                         // Insert tooltip text into tooltip
+        p.appendChild(tooltip);                             // Insert hidden span into tooltip
+        h.appendChild(t);                                   // Insert Title text into title
+        linksContainer.insertBefore(titleWrap, st[0]);      // Insert wrapper into HTML
+        
 
         // Sort by quality
         if (linkQuality != 'any') {
@@ -63,11 +81,8 @@ function sortLinks(type) {
         }
 
         // Sort by Lang and sub
-        console.log(links);
         for (var i = 0; i < links.length; i += 1) {
             // Get flags
-            console.log(links[i].getElementsByClassName('language'));
-            console.log(i);
             var langSubsFlags = links[i].getElementsByClassName('language')[0].getElementsByTagName('img');
 
             // Check lang
@@ -109,7 +124,7 @@ function checkLinks() {
             // Check if links loaded
             if (popupaportes.length != 0) {
                 // Check if already sorted
-                if (document.getElementById('sorted-links') == null) {
+                if (document.getElementById('pls-title-sorted-links') == null) {
                     // Sort links
                     sortLinks('online');
                     sortLinks('download');
