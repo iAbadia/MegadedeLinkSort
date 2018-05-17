@@ -71,6 +71,10 @@ function initButtons() {
         // Set state
         document.getElementById('myonoffswitch').checked = it.active;
 
+        // Set transition once initial value assigned
+        // Little hack: Wait 250ms, enough for HTML to load. This way we avoid switch to update on every load.
+        setTimeout(function() {document.getElementById('myonoffswitch-label').classList.add('onoffswitch-label-anim');}, 250);
+
         // Retrieve quality and set button style
         chrome.storage.local.get(['quality'], function (items) {
             switch (items.quality) {

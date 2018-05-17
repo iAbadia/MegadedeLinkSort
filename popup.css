@@ -122,8 +122,12 @@ body {
     height: 30px; padding: 0; line-height: 30px;
     border: 2px solid #999999; border-radius: 4px;
     background-color: #EEEEEE;
+    /*transition: background-color 0.3s ease-in;*/
+}
+.onoffswitch-label-anim {
     transition: background-color 0.3s ease-in;
 }
+
 .onoffswitch-label:before {
     content: "";
     display: block; width: 30px; margin: 0px;
@@ -131,8 +135,11 @@ body {
     position: absolute; top: 0; bottom: 0;
     right: 58px;
     border: 2px solid #999999; border-radius: 4px;
-    transition: all 0.3s ease-in 0s; 
+    /*transition: all 0.3s ease-in 0s;*/
 }
+.onoffswitch-label-anim:before {
+    transition: all 0.3s ease-in 0s;
+} 
 .onoffswitch-checkbox:checked + .onoffswitch-label {
     background-color: #af0806;
 }
