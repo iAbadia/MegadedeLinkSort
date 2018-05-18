@@ -163,6 +163,19 @@ function initButtons() {
 
 // Set onclik listeners
 document.addEventListener('DOMContentLoaded', function () {
+    // Initial config
+    chrome.storage.local.get(['initconfig'], function (items) {
+        if (items.initconfig == undefined) {
+            // Initialise values
+            chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' }, function (items) {
+                initButtons();
+            });
+        } else {
+            initButtons();
+        }
+    });
+
+    // Set click listeners
     document.getElementById('myonoffswitch').addEventListener("click", function () { changeActive() });
 
     document.getElementById('qua-any-button').addEventListener("click", function () { changeQuality("any") });
@@ -179,16 +192,4 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('subs-esp-button').addEventListener("click", function () { changeSubs("esp") });
     document.getElementById('subs-eng-button').addEventListener("click", function () { changeSubs("eng") });
     document.getElementById('subs-none-button').addEventListener("click", function () { changeSubs("none") });
-
-    // Initial config
-    chrome.storage.local.get(['initconfig'], function (items) {
-        if (items.initconfig == undefined) {
-            // Initialise values
-            chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' }, function (items) {
-                initButtons();
-            });
-        } else {
-            initButtons();
-        }
-    });
 });
