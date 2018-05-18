@@ -25,6 +25,12 @@ function toLang(lang) {
     }
 }
 
+// Check if links are shown
+function displayedLinks() {
+    var popupaportes = document.getElementsByClassName('popup-aportes');
+    return popupaportes.length != 0;
+}
+
 // Create sorted links section
 function createSortedLinksSection(type) {
     // Get links container
@@ -75,81 +81,111 @@ function createSortedLinksSection(type) {
     linksContainer.insertBefore(sortedHostsContainer, st[0]);
 }
 
+// Remove added title and links
+function clearSortedLinksSection(type) {
+    // Remove whole DIV
+    if (displayedLinks()) {
+        let section = document.getElementById("pls-sorted-hosts-container-" + type);
+        section.parentNode.removeChild(section);
+    }
+}
+
 // Type must be 'online' or 'download' (Online/Download link list IDs)
 function sortLinks(type) {
     // Retrieve selected quality, lang and subs.
-    chrome.storage.local.get(['quality', 'lang', 'subs'], function (items) {
-        linkQuality = items.quality;
-        linkLang = items.lang;
-        linkSubs = items.subs;
+    if (displayedLinks()) {
+        chrome.storage.local.get(['quality', 'lang', 'subs'], function (items) {
+            linkQuality = items.quality;
+            linkLang = items.lang;
+            linkSubs = items.subs;
 
-        // Get sorted links container
-        var linksContainer = document.getElementById(type);
-        var links = linksContainer.getElementsByClassName('aporte');
-        links = Array.from(links);  // Convert HTMLCollection to JS Array
+            // Get sorted links container
+            var linksContainer = document.getElementById(type);
+            var links = linksContainer.getElementsByClassName('aporte');
+            links = Array.from(links);  // Convert HTMLCollection to JS Array
 
-        // Check for no links
-        if (links.length == 0) {
-            return;
-        }
+            // Check for no links
+            if (links.length == 0) {
+                return;
+            }
 
-        // Sort by quality
-        if (linkQuality != 'any') {
+            // Sort by quality
+            if (linkQuality != 'any') {
+                for (var i = 0; i < links.length; i += 1) {
+                    if (!links[i].className.includes(linkQuality)) {
+                        // Remove from array
+                        links.splice(i, 1);
+                        i -= 1; // Counter-update index
+                    }
+                }
+            }
+
+            // Sort by Lang and sub
             for (var i = 0; i < links.length; i += 1) {
-                if (!links[i].className.includes(linkQuality)) {
-                    // Remove from array
-                    links.splice(i, 1);
-                    i -= 1; // Counter-update index
+                // Get flags
+                var langSubsFlags = links[i].getElementsByClassName('language')[0].getElementsByTagName('img');
+
+                // Check lang
+                if (linkLang != 'any') {
+                    if (!langSubsFlags[0].src.includes(toLang(linkLang))) {
+                        links.splice(i, 1);
+                        i -= 1; // Counter-update index (we just altered the array length)
+                        continue;   // Link removed, don't care about subs
+                    }
+                }
+
+                // Check subs
+                if (linkSubs != 'any') {
+                    // Remove if no subs but some sub selected OR sub selected but not matching lang
+                    if ((langSubsFlags.length == 1 && linkSubs != 'none') ||
+                        (langSubsFlags.length > 1 && !langSubsFlags[1].src.includes(toLang(linkSubs)))) {
+                        links.splice(i, 1);
+                        i -= 1; // Counter-update index (we just altered the array length)
+                    }
                 }
             }
-        }
 
-        // Sort by Lang and sub
-        for (var i = 0; i < links.length; i += 1) {
-            // Get flags
-            var langSubsFlags = links[i].getElementsByClassName('language')[0].getElementsByTagName('img');
+            // Insert links
+            var sortedLinksContainer = document.getElementById("pls-sorted-links-container-" + type);
+            if (links.length > 0) {
+                for (var i = 0; i < links.length; i += 1) {
+                    sortedLinksContainer.appendChild(createElementFromHTML(links[i].outerHTML));
+                }
+            } else {
+                let noLinksWarn = createElementFromHTML('<p> No links matching criteria </p>');
+                noLinksWarn.className = "alert alert-warning";  // Classes from Plusdede's css
+                sortedLinksContainer.appendChild(noLinksWarn);
+            }
+        });
+    }
+}
 
-            // Check lang
-            if (linkLang != 'any') {
-                if (!langSubsFlags[0].src.includes(toLang(linkLang))) {
-                    links.splice(i, 1);
-                    i -= 1; // Counter-update index (we just altered the array length)
-                    continue;   // Link removed, don't care about subs
+// Remove sorted links
+function clearSortedLinks(type) {
+    chrome.storage.local.get(['active'], function (items) {
+        if (items.active == undefined || items.active) {
+            // Check if links loaded
+            if (displayedLinks()) {
+                // Check if already sorted
+                if (document.getElementById('pls-title-sorted-links-online') != null) { // Could test for either online or download
+                    // Clear sorted links
+                    let links = document.getElementById("pls-sorted-links-container-" + type);
+                    while (links.firstChild) {
+                        links.removeChild(links.firstChild);
+                    }
                 }
             }
-
-            // Check subs
-            if (linkSubs != 'any') {
-                // Remove if no subs but some sub selected OR sub selected but not matching lang
-                if ((langSubsFlags.length == 1 && linkSubs != 'none') ||
-                    (langSubsFlags.length > 1 && !langSubsFlags[1].src.includes(toLang(linkSubs)))) {
-                    links.splice(i, 1);
-                    i -= 1; // Counter-update index (we just altered the array length)
-                }
-            }
-        }
-
-        // Insert links
-        var sortedLinksContainer = document.getElementById("pls-sorted-links-container-" + type);
-        if (links.length > 0) {
-            for (var i = 0; i < links.length; i += 1) {
-                sortedLinksContainer.appendChild(createElementFromHTML(links[i].outerHTML));
-            }
-        } else {
-            let noLinksWarn = createElementFromHTML('<p> No links matching criteria </p>');
-            noLinksWarn.className = "alert alert-warning";  // Classes from Plusdede's css
-            sortedLinksContainer.appendChild(noLinksWarn);
         }
     });
 }
 
+// Check for links displayed and sort if active (periodically executed)
 function checkLinks() {
-    // Check if sorting active
-    chrome.storage.local.get(['active'], function (items) {
-        if (items.active == undefined || items.active) {
-            var popupaportes = document.getElementsByClassName('popup-aportes');
-            // Check if links loaded
-            if (popupaportes.length != 0) {
+    // Check if links are displayed
+    if (displayedLinks()) {
+        // Check if sorting active
+        chrome.storage.local.get(['active'], function (items) {
+            if (items.active == undefined || items.active) {
                 // Check if already sorted
                 if (document.getElementById('pls-title-sorted-links-online') == null) { // Could test for either online or download
                     // Sort links
@@ -159,8 +195,8 @@ function checkLinks() {
                     sortLinks('download');
                 }
             }
-        }
-    });
+        });
+    }
 }
 
 // Start checkLinks loop
@@ -169,8 +205,22 @@ setInterval(checkLinks, 1000);
 // Updates listener
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
-        console.log(sender.tab ?
-            "from a content script:" + sender.tab.url :
-            "from the extension");
+        if (!sender.tab && request.action != undefined) {
+            // Sorting criteria or active change
+            if (displayedLinks() && request.action.match(/^(quality|language|subtitles)$/)) {
+                // Clear sorted hosts
+                clearSortedLinks("online");
+                clearSortedLinks("download");
+
+                // Update sorted hosts
+                sortLinks("online");
+                sortLinks("download");
+            } else if (displayedLinks() && request.action == "disable") {
+                // Remove sorted hosts section
+                clearSortedLinksSection("online");
+                clearSortedLinksSection("download");
+            }
+        }
+        // Send response
         sendResponse({ ok: true });
     });

@@ -1,9 +1,9 @@
 // Notify content script a setting has changed
-function notifyUpdate() {
+function notifyUpdate(msg) {
     chrome.tabs.query({ url: "https://www.plusdede.com/*" }, function (tabs) {
         if (tabs.length > 0) {
             for (let i = 0; i < tabs.length; i++) {
-                chrome.tabs.sendMessage(tabs[i].id, { action: "update" }, function (response) {
+                chrome.tabs.sendMessage(tabs[i].id, { action: msg }, function (response) {
                     console.log(response.ok);
                 });
             }
@@ -23,8 +23,11 @@ function changeActive() {
             document.getElementById('myonoffswitch').checked = !active;
             // Update buttons
             resetButtonsStyle();
-            // Notify content script to update list
-            notifyUpdate();
+            // Notify content script to update list (only when disabling)
+            // When enabling the content script will kick in in less than 1sec
+            if(active) {    // If (previously) active (meaning now disabled)
+                notifyUpdate("disable");
+            }
         });
     });
 }
@@ -35,7 +38,7 @@ function changeQuality(quality) {
         // Update buttons
         resetButtonsStyle();
         // Notify content script to update list
-        notifyUpdate();
+        notifyUpdate("quality");
     });
 };
 
@@ -45,7 +48,7 @@ function changeLang(language) {
         // Update buttons
         resetButtonsStyle();
         // Notify content script to update list
-        notifyUpdate();
+        notifyUpdate("language");
     });
 };
 
@@ -55,7 +58,7 @@ function changeSubs(subs) {
         // Update buttons
         resetButtonsStyle();
         // Notify content script to update list
-        notifyUpdate();
+        notifyUpdate("subtitles");
     });
 };
 
