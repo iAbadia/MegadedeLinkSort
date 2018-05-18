@@ -2,7 +2,13 @@
 chrome.storage.local.get(['initconfig'], function (items) {
     if (items.initconfig == undefined) {
         // Initialise values
-        chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' });
+        chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' }, function(){
+            // Start checkLinks loop
+            setInterval(checkLinks, 1000);
+        });
+    } else {
+        // Start checkLinks loop
+        setInterval(checkLinks, 1000);
     }
 });
 
@@ -206,9 +212,6 @@ function checkLinks() {
         });
     }
 }
-
-// Start checkLinks loop
-setInterval(checkLinks, 1000);
 
 // Updates listener
 chrome.runtime.onMessage.addListener(
