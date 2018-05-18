@@ -1,3 +1,16 @@
+// Notify content script a setting has changed
+function notifyUpdate() {
+    chrome.tabs.query({ url: "https://www.plusdede.com/*" }, function (tabs) {
+        if (tabs.length > 0) {
+            for (let i = 0; i < tabs.length; i++) {
+                chrome.tabs.sendMessage(tabs[i].id, { action: "update" }, function (response) {
+                    console.log(response.ok);
+                });
+            }
+        }
+    });
+}
+
 // Update active
 function changeActive() {
     chrome.storage.local.get(['active'], function (items) {
@@ -10,6 +23,8 @@ function changeActive() {
             document.getElementById('myonoffswitch').checked = !active;
             // Update buttons
             resetButtonsStyle();
+            // Notify content script to update list
+            notifyUpdate();
         });
     });
 }
@@ -19,6 +34,8 @@ function changeQuality(quality) {
     chrome.storage.local.set({ 'quality': quality }, function (items) {
         // Update buttons
         resetButtonsStyle();
+        // Notify content script to update list
+        notifyUpdate();
     });
 };
 
@@ -27,6 +44,8 @@ function changeLang(language) {
     chrome.storage.local.set({ 'lang': language }, function (items) {
         // Update buttons
         resetButtonsStyle();
+        // Notify content script to update list
+        notifyUpdate();
     });
 };
 
@@ -35,6 +54,8 @@ function changeSubs(subs) {
     chrome.storage.local.set({ 'subs': subs }, function (items) {
         // Update buttons
         resetButtonsStyle();
+        // Notify content script to update list
+        notifyUpdate();
     });
 };
 
@@ -73,7 +94,7 @@ function initButtons() {
 
         // Set transition once initial value assigned
         // Little hack: Wait 250ms, enough for HTML to load. This way we avoid switch to update on every load.
-        setTimeout(function() {document.getElementById('myonoffswitch-label').classList.add('onoffswitch-label-anim');}, 250);
+        setTimeout(function () { document.getElementById('myonoffswitch-label').classList.add('onoffswitch-label-anim'); }, 250);
 
         // Retrieve quality and set button style
         chrome.storage.local.get(['quality'], function (items) {
