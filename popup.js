@@ -13,7 +13,7 @@ function notifyUpdate(msg) {
 
 // Update active
 function changeActive() {
-    chrome.storage.local.get(['active'], function (items) {
+    chrome.storage.local.get('active', function (items) {
         // By default set active
         var active = items.active == undefined ? false : items.active;
         console.log(active);
@@ -85,7 +85,7 @@ function resetButtonsStyle() {
 // Initialisation
 function initButtons() {
     // Retrieve active state
-    chrome.storage.local.get(['active'], function (it) {
+    chrome.storage.local.get('active', function (it) {
         // If its not defined, changeActive will set it to true
         if (it.active == undefined) {
             changeActive();
@@ -100,7 +100,7 @@ function initButtons() {
         setTimeout(function () { document.getElementById('myonoffswitch-label').classList.add('onoffswitch-label-anim'); }, 250);
 
         // Retrieve quality and set button style
-        chrome.storage.local.get(['quality'], function (items) {
+        chrome.storage.local.get('quality', function (items) {
             switch (items.quality) {
                 case 'any':
                     document.getElementById('qua-any-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
@@ -120,7 +120,7 @@ function initButtons() {
         });
 
         // Retrieve lang and set button style
-        chrome.storage.local.get(['lang'], function (items) {
+        chrome.storage.local.get('lang', function (items) {
             switch (items.lang) {
                 case 'any':
                     document.getElementById('lang-any-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
@@ -140,7 +140,7 @@ function initButtons() {
         });
 
         // Retrieve subs and set button style
-        chrome.storage.local.get(['subs'], function (items) {
+        chrome.storage.local.get('subs', function (items) {
             switch (items.subs) {
                 case 'any':
                     document.getElementById('subs-any-button').classList.add(it.active ? "button-selected" : "button-selected-unactive");
@@ -164,7 +164,7 @@ function initButtons() {
 // Set onclik listeners
 document.addEventListener('DOMContentLoaded', function () {
     // Initial config
-    chrome.storage.local.get(['initconfig'], function (items) {
+    chrome.storage.local.get('initconfig', function (items) {
         if (items.initconfig == undefined) {
             // Initialise values
             chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' }, function (items) {

@@ -1,5 +1,5 @@
 // Initial config
-chrome.storage.local.get(['initconfig'], function (items) {
+chrome.storage.local.get('initconfig', function (items) {
     if (items.initconfig == undefined) {
         // Initialise values
         chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' }, function(){
@@ -176,7 +176,7 @@ function sortLinks(type) {
 
 // Remove sorted links
 function clearSortedLinks(type) {
-    chrome.storage.local.get(['active'], function (items) {
+    chrome.storage.local.get('active', function (items) {
         if (items.active == undefined || items.active) {
             // Check if links loaded
             if (displayedLinks()) {
@@ -198,7 +198,7 @@ function checkLinks() {
     // Check if links are displayed
     if (displayedLinks()) {
         // Check if sorting active
-        chrome.storage.local.get(['active'], function (items) {
+        chrome.storage.local.get('active', function (items) {
             if (items.active == undefined || items.active) {
                 // Check if already sorted
                 if (document.getElementById('pls-title-sorted-links-online') == null) { // Could test for either online or download
