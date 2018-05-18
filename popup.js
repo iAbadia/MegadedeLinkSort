@@ -25,7 +25,7 @@ function changeActive() {
             resetButtonsStyle();
             // Notify content script to update list (only when disabling)
             // When enabling the content script will kick in in less than 1sec
-            if(active) {    // If (previously) active (meaning now disabled)
+            if (active) {    // If (previously) active (meaning now disabled)
                 notifyUpdate("disable");
             }
         });
@@ -180,5 +180,15 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('subs-eng-button').addEventListener("click", function () { changeSubs("eng") });
     document.getElementById('subs-none-button').addEventListener("click", function () { changeSubs("none") });
 
-    initButtons();
+    // Initial config
+    chrome.storage.local.get(['initconfig'], function (items) {
+        if (items.initconfig == undefined) {
+            // Initialise values
+            chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' }, function (items) {
+                initButtons();
+            });
+        } else {
+            initButtons();
+        }
+    });
 });

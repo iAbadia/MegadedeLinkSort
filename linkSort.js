@@ -1,3 +1,11 @@
+// Initial config
+chrome.storage.local.get(['initconfig'], function (items) {
+    if (items.initconfig == undefined) {
+        // Initialise values
+        chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' });
+    }
+});
+
 // Define Node creator function
 function createElementFromHTML(htmlString) {
     var div = document.createElement('div');
