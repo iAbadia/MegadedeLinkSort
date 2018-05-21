@@ -48,6 +48,7 @@
     padding-right: .5em !important;
     height: 1.5em;
     width: max-content;
+    width: -moz-max-content;
     line-height: 1em;
     background-color: #bbbbbb;
     color: white;
