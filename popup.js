@@ -1,11 +1,21 @@
-// Notify content script a setting has changed
-function notifyUpdate(msg) {
+// Notify update to content-script
+var notifyUpdate;   // Will be assigned to one of the vendor-specific functions
+// Chrome-specific notify function
+function notifyUpdateChrome(msg) {
     chrome.tabs.query({ url: "https://www.plusdede.com/*" }, function (tabs) {
         if (tabs.length > 0) {
             for (let i = 0; i < tabs.length; i++) {
-                chrome.tabs.sendMessage(tabs[i].id, { action: msg }, function (response) {
-                    console.log(response.ok);
-                });
+                chrome.tabs.sendMessage(tabs[i].id, { action: msg });
+            }
+        }
+    });
+}
+// Firefox specific notify function
+function notifyUpdateFirefox(msg) {
+    browser.tabs.query({ currentWindow: true }).then(function (tabs) {
+        if (tabs.length > 0) {
+            for (let i = 0; i < tabs.length; i++) {
+                browser.tabs.sendMessage(tabs[i].id, { action: msg }).catch(function (err) { return undefined; });
             }
         }
     });
@@ -16,7 +26,6 @@ function changeActive() {
     chrome.storage.local.get('active', function (items) {
         // By default set active
         var active = items.active == undefined ? false : items.active;
-        console.log(active);
 
         chrome.storage.local.set({ 'active': !active }, function (items) {
             // Change switch state
@@ -161,9 +170,9 @@ function initButtons() {
     });
 }
 
-// Set onclik listeners
+// Initial config
 document.addEventListener('DOMContentLoaded', function () {
-    // Initial config
+    // Button configuration
     chrome.storage.local.get('initconfig', function (items) {
         if (items.initconfig == undefined) {
             // Initialise values
@@ -192,4 +201,16 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('subs-esp-button').addEventListener("click", function () { changeSubs("esp") });
     document.getElementById('subs-eng-button').addEventListener("click", function () { changeSubs("eng") });
     document.getElementById('subs-none-button').addEventListener("click", function () { changeSubs("none") });
+
+    // Set notify callback function (vendor specific)
+    let isChrome = navigator.userAgent.indexOf("Chrome") != -1;
+    let isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
+
+    if (isChrome) {
+        notifyUpdate = notifyUpdateChrome;
+    } else if (isFirefox) {
+        notifyUpdate = notifyUpdateFirefox;
+    } else {
+        console.error("SOMETHING IS VERY WRONG...");
+    }
 });

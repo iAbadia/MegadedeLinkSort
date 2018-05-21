@@ -2,7 +2,7 @@
 chrome.storage.local.get('initconfig', function (items) {
     if (items.initconfig == undefined) {
         // Initialise values
-        chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' }, function(){
+        chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' }, function () {
             // Start checkLinks loop
             setInterval(checkLinks, 1000);
         });
@@ -213,25 +213,38 @@ function checkLinks() {
     }
 }
 
-// Updates listener
-chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
-        if (!sender.tab && request.action != undefined) {
-            // Sorting criteria or active change
-            if (displayedLinks() && request.action.match(/^(quality|language|subtitles)$/)) {
-                // Clear sorted hosts
-                clearSortedLinks("online");
-                clearSortedLinks("download");
+// Updates listener (vendor specific)
+function onMsgFirefox(message) {
+    if (message.action != undefined) {
+        // Sorting criteria or active change
+        if (displayedLinks() && message.action.match(/^(quality|language|subtitles)$/)) {
+            // Clear sorted hosts
+            clearSortedLinks("online");
+            clearSortedLinks("download");
 
-                // Update sorted hosts
-                sortLinks("online");
-                sortLinks("download");
-            } else if (displayedLinks() && request.action == "disable") {
-                // Remove sorted hosts section
-                clearSortedLinksSection("online");
-                clearSortedLinksSection("download");
-            }
+            // Update sorted hosts
+            sortLinks("online");
+            sortLinks("download");
+        } else if (displayedLinks() && message.action == "disable") {
+            // Remove sorted hosts section
+            clearSortedLinksSection("online");
+            clearSortedLinksSection("download");
         }
-        // Send response
-        sendResponse({ ok: true });
-    });
+    }
+}
+function onMsgChrome(request, sender, sendResponse) {
+    if (!sender.tab) {
+        onMsgFirefox(request);
+    }
+}
+// Vendor test
+var isChrome = navigator.userAgent.indexOf("Chrome") != -1;
+var isFirefox = navigator.userAgent.indexOf("Firefox") != -1;
+
+if (isChrome) {
+    chrome.runtime.onMessage.addListener(onMsgChrome);
+} else if (isFirefox) {
+    chrome.runtime.onMessage.addListener(onMsgFirefox);
+} else {
+    console.error("SOMETHING IS VERY WRONG...");
+}
