@@ -76,7 +76,7 @@ function createSortedLinksSection(type) {
 
     var t = document.createTextNode("Sorted Hosts");    // Create inside-text nodes
     var infoTooltip = document.createTextNode("");
-    var tooltipText = document.createTextNode("Plusdede Link Sort Extension");
+    var tooltipText = document.createTextNode("Megadede Link Sort Extension");
 
     tooltip.appendChild(tooltipText);                   // Insert text into hidden span
     p.appendChild(infoTooltip);                         // Insert tooltip text into tooltip
@@ -167,7 +167,7 @@ function sortLinks(type) {
                 }
             } else {
                 let noLinksWarn = createElementFromHTML('<p> No links matching criteria </p>');
-                noLinksWarn.className = "alert alert-warning";  // Classes from Plusdede's css
+                noLinksWarn.className = "alert alert-warning";  // Classes from Megadede's css
                 sortedLinksContainer.appendChild(noLinksWarn);
             }
         });

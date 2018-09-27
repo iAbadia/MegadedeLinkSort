@@ -1,5 +1,5 @@
-# Plusdede Link Sort
-Sort Plusdede links with this awesome Chrome extension/Firefox addon!
+# Megadede Link Sort (previously Plusdede Link Sort)
+Sort Megadede links with this awesome Chrome extension/Firefox addon!
 
 <p align="center">
   <img height="500px" src="media/sample2-640x400.jpg" alt="This is how it looks!"/>

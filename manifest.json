@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "Plusdede Link Sort",
-    "short_name": "PLS",
-    "description": "Plusdede Link Sorter",
+    "name": "Megadede Link Sort",
+    "short_name": "MLS",
+    "description": "Megadede Link Sorter",
     "version": "1.1",
     "browser_action": {
         "default_icon": "icon.png",
@@ -12,13 +12,13 @@
     "content_scripts": [
         {
             "css": [
-                "plusdedeLinkSort.css"
+                "megadedeLinkSort.css"
             ],
             "js": [
                 "linkSort.js"
             ],
             "matches": [
-                "https://www.plusdede.com/*"
+                "https://www.megadede.com/*"
             ]
         }
     ],
@@ -26,5 +26,5 @@
         "activeTab",
         "storage"
     ],
-    "web_accessible_resources": ["plusdedeLinkSort.css"]
+    "web_accessible_resources": ["megadedeLinkSort.css"]
 }
