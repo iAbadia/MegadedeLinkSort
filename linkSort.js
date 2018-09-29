@@ -1,14 +1,31 @@
-// Initial config
+// Storage initial config
 chrome.storage.local.get('globalConfig', function (items) {
     if (items.globalConfig == undefined) {
         // Initialise values
-        chrome.storage.local.set({ 'globalConfig': {'active': true, 'quality': 'any', 'lang': 'any', 'subs': 'any'} }, function (items) {
-            // Start checkLinks loop
-            setInterval(checkLinks, 1000);
+        chrome.storage.local.set({ 'globalConfig': { 'active': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' } }, function (itm) {
+            chrome.storage.local.get('spec', function (items) {
+                if (items.spec == undefined) {
+                    items.spec = { 'serie': {}, 'peli': {} };
+                    chrome.storage.local.set({ 'spec': items.spec }, function (itemsSpec) {
+                        setInterval(checkLinks, 1000);
+                    });
+                } else {
+                    setInterval(checkLinks, 1000);
+                }
+            });
         });
     } else {
         // Start checkLinks loop
-        setInterval(checkLinks, 1000);
+        chrome.storage.local.get('spec', function (items) {
+            if (items.spec == undefined) {
+                items.spec = { 'serie': {}, 'peli': {} };
+                chrome.storage.local.set({ 'spec': items.spec }, function (itemsSpec) {
+                    setInterval(checkLinks, 1000);
+                });
+            } else {
+                setInterval(checkLinks, 1000);
+            }
+        });
     }
 });
 
@@ -106,70 +123,87 @@ function clearSortedLinksSection(type) {
 
 // Type must be 'online' or 'download' (Online/Download link list IDs)
 function sortLinks(type) {
+    console.log("sortLinks");
     // Retrieve selected quality, lang and subs.
     if (displayedLinks()) {
-        chrome.storage.local.get('globalConfig', function (items) {
-            linkQuality = items.globalConfig.quality;
-            linkLang = items.globalConfig.lang;
-            linkSubs = items.globalConfig.subs;
+        console.log("displayed");
+        // Get peli/serie name
+        var urlSplit = window.location.pathname.split('/');
+        var urlType = urlSplit[urlSplit.length - 2];
+        var urlName = urlSplit[urlSplit.length - 1];
+        // Get spec JSON
+        chrome.storage.local.get('spec', function (items) {
+            // Use gloabl config
+            chrome.storage.local.get('globalConfig', function (it) {
+                // First time it wont exist
+                if (items.spec[urlType][urlName] != undefined && items.spec[urlType][urlName].enable) {
+                    linkQuality = items.spec[urlType][urlName].config.quality;
+                    linkLang = items.spec[urlType][urlName].config.lang;
+                    linkSubs = items.spec[urlType][urlName].config.subs;
+                } else {
+                    linkQuality = it.globalConfig.quality;
+                    linkLang = it.globalConfig.lang;
+                    linkSubs = it.globalConfig.subs;
+                }
 
-            // Get sorted links container
-            var linksContainer = document.getElementById(type);
-            var links = linksContainer.getElementsByClassName('aporte');
-            links = Array.from(links);  // Convert HTMLCollection to JS Array
+                // Get sorted links container
+                var linksContainer = document.getElementById(type);
+                var links = linksContainer.getElementsByClassName('aporte');
+                links = Array.from(links);  // Convert HTMLCollection to JS Array
 
-            // Check for no links
-            if (links.length == 0) {
-                return;
-            }
+                // Check for no links
+                if (links.length == 0) {
+                    return;
+                }
 
-            // Sort by quality
-            if (linkQuality != 'any') {
+                // Sort by quality
+                if (linkQuality != 'any') {
+                    for (var i = 0; i < links.length; i += 1) {
+                        if (!links[i].className.includes(linkQuality)) {
+                            // Remove from array
+                            links.splice(i, 1);
+                            i -= 1; // Counter-update index
+                        }
+                    }
+                }
+
+                // Sort by Lang and sub
                 for (var i = 0; i < links.length; i += 1) {
-                    if (!links[i].className.includes(linkQuality)) {
-                        // Remove from array
-                        links.splice(i, 1);
-                        i -= 1; // Counter-update index
+                    // Get flags
+                    var langSubsFlags = links[i].getElementsByClassName('language')[0].getElementsByTagName('img');
+
+                    // Check lang
+                    if (linkLang != 'any') {
+                        if (!langSubsFlags[0].src.includes(toLang(linkLang))) {
+                            links.splice(i, 1);
+                            i -= 1; // Counter-update index (we just altered the array length)
+                            continue;   // Link removed, don't care about subs
+                        }
+                    }
+
+                    // Check subs
+                    if (linkSubs != 'any') {
+                        // Remove if no subs but some sub selected OR sub selected but not matching lang
+                        if ((langSubsFlags.length == 1 && linkSubs != 'none') ||
+                            (langSubsFlags.length > 1 && !langSubsFlags[1].src.includes(toLang(linkSubs)))) {
+                            links.splice(i, 1);
+                            i -= 1; // Counter-update index (we just altered the array length)
+                        }
                     }
                 }
-            }
 
-            // Sort by Lang and sub
-            for (var i = 0; i < links.length; i += 1) {
-                // Get flags
-                var langSubsFlags = links[i].getElementsByClassName('language')[0].getElementsByTagName('img');
-
-                // Check lang
-                if (linkLang != 'any') {
-                    if (!langSubsFlags[0].src.includes(toLang(linkLang))) {
-                        links.splice(i, 1);
-                        i -= 1; // Counter-update index (we just altered the array length)
-                        continue;   // Link removed, don't care about subs
+                // Insert links
+                var sortedLinksContainer = document.getElementById("pls-sorted-links-container-" + type);
+                if (links.length > 0) {
+                    for (var i = 0; i < links.length; i += 1) {
+                        sortedLinksContainer.appendChild(createElementFromHTML(links[i].outerHTML));
                     }
+                } else {
+                    let noLinksWarn = createElementFromHTML('<p> No links matching criteria </p>');
+                    noLinksWarn.className = "alert alert-warning";  // Classes from Megadede's css
+                    sortedLinksContainer.appendChild(noLinksWarn);
                 }
-
-                // Check subs
-                if (linkSubs != 'any') {
-                    // Remove if no subs but some sub selected OR sub selected but not matching lang
-                    if ((langSubsFlags.length == 1 && linkSubs != 'none') ||
-                        (langSubsFlags.length > 1 && !langSubsFlags[1].src.includes(toLang(linkSubs)))) {
-                        links.splice(i, 1);
-                        i -= 1; // Counter-update index (we just altered the array length)
-                    }
-                }
-            }
-
-            // Insert links
-            var sortedLinksContainer = document.getElementById("pls-sorted-links-container-" + type);
-            if (links.length > 0) {
-                for (var i = 0; i < links.length; i += 1) {
-                    sortedLinksContainer.appendChild(createElementFromHTML(links[i].outerHTML));
-                }
-            } else {
-                let noLinksWarn = createElementFromHTML('<p> No links matching criteria </p>');
-                noLinksWarn.className = "alert alert-warning";  // Classes from Megadede's css
-                sortedLinksContainer.appendChild(noLinksWarn);
-            }
+            });
         });
     }
 }
@@ -217,7 +251,7 @@ function checkLinks() {
 function onMsgFirefox(message) {
     if (message.action != undefined) {
         // Sorting criteria or active change
-        if (displayedLinks() && message.action.match(/^(quality|language|subtitles)$/)) {
+        if (displayedLinks() && message.action.match(/^(quality|lang|subs|sync)$/)) {
             // Clear sorted hosts
             clearSortedLinks("online");
             clearSortedLinks("download");

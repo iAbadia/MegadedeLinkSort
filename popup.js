@@ -49,25 +49,24 @@ function changeSync() {
         var urlSplit = url.split("/");
         var urlType = urlSplit[urlSplit.length - 2];
         var urlName = urlSplit[urlSplit.length - 1];
-        // Get sync JSON
-        chrome.storage.local.get('sync', function (items) {
-            console.log(items.sync);
-            var syncJson = items.sync == undefined ? { 'serie': {}, 'peli': {} } : items.sync;
+        // Get spec JSON
+        chrome.storage.local.get('spec', function (items) {
+            specJson = items.spec;
             // Create serie/peli obj if undefined
-            if (syncJson[urlType][urlName] == undefined) { syncJson[urlType][urlName] = {}; }
-            // New value for sync
-            var newVal = !(syncJson[urlType][urlName].enable == undefined || syncJson[urlType][urlName].enable);
-            syncJson[urlType][urlName].enable = newVal;
-            // If no set config, set global (Callback Hell...)
-            if (syncJson[urlType][urlName].config == undefined) {
-                syncJson[urlType][urlName].config = {};
+            if (specJson[urlType][urlName] == undefined) { specJson[urlType][urlName] = {}; }
+            // New value for spec
+            var newVal = specJson[urlType][urlName].enable == undefined || !specJson[urlType][urlName].enable;
+            specJson[urlType][urlName].enable = newVal;
+            // If no set config, set global
+            if (specJson[urlType][urlName].config == undefined) {
+                specJson[urlType][urlName].config = {};
                 chrome.storage.local.get('globalConfig', function (it) {
-                    syncJson[urlType][urlName].config.active = it.globalConfig.active;
-                    syncJson[urlType][urlName].config.quality = it.globalConfig.quality;
-                    syncJson[urlType][urlName].config.lang = it.globalConfig.lang;
-                    syncJson[urlType][urlName].config.subs = it.globalConfig.subs;
+                    specJson[urlType][urlName].config.quality = it.globalConfig.quality;
+                    specJson[urlType][urlName].config.lang = it.globalConfig.lang;
+                    specJson[urlType][urlName].config.subs = it.globalConfig.subs;
+                    console.log(specJson);
                     // Save new JSON
-                    chrome.storage.local.set({ 'sync': syncJson }, function (items) {
+                    chrome.storage.local.set({ 'spec': specJson }, function (items) {
                         // Update buttons
                         resetButtonsStyle();
                         // Notify content script to update list (only when disabling)
@@ -77,7 +76,8 @@ function changeSync() {
                 });
             } else {
                 // Save new JSON
-                chrome.storage.local.set({ 'sync': syncJson }, function (items) {
+                console.log(specJson);
+                chrome.storage.local.set({ 'spec': specJson }, function (items) {
                     // Update buttons
                     resetButtonsStyle();
                     // Notify content script to update list (only when disabling)
@@ -91,39 +91,120 @@ function changeSync() {
 
 // Update quality
 function changeQuality(quality) {
-    chrome.storage.local.get('globalConfig', function (it) {
-        it.globalConfig.quality = quality;
-        chrome.storage.local.set({ 'globalConfig': it.globalConfig }, function (items) {
-            // Update buttons
-            resetButtonsStyle();
-            // Notify content script to update list
-            notifyUpdate("quality");
+    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+        // Get peli/serie name
+        var url = tabs[0].url;
+        var urlSplit = url.split("/");
+        var urlType = urlSplit[urlSplit.length - 2];
+        var urlName = urlSplit[urlSplit.length - 1];
+        // Get spec JSON
+        chrome.storage.local.get('globalConfig', function (it) {
+            chrome.storage.local.get('spec', function (items) {
+                specJson = items.spec;
+                // If spec enabled, change spec. Change global otherwise
+                if (specJson[urlType][urlName].enable) {
+                    specJson[urlType][urlName].config.quality = quality;
+                    chrome.storage.local.set({ 'spec': specJson }, function (items) {
+                        // Update buttons
+                        resetButtonsStyle();
+                        // Notify content script to update list
+                        if (it.globalConfig.active) {
+                            notifyUpdate("quality");
+                        }
+                    });
+                } else {
+                    it.globalConfig.quality = quality;
+                    chrome.storage.local.set({ 'globalConfig': it.globalConfig }, function (items) {
+                        // Update buttons
+                        resetButtonsStyle();
+                        // Notify content script to update list
+                        if (it.globalConfig.active) {
+                            notifyUpdate("quality");
+                        }
+                    });
+
+                }
+            });
         });
     });
 };
 
 // Update language
 function changeLang(lang) {
-    chrome.storage.local.get('globalConfig', function (it) {
-        it.globalConfig.lang = lang;
-        chrome.storage.local.set({ 'globalConfig': it.globalConfig }, function (items) {
-            // Update buttons
-            resetButtonsStyle();
-            // Notify content script to update list
-            notifyUpdate("language");
+    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+        // Get peli/serie name
+        var url = tabs[0].url;
+        var urlSplit = url.split("/");
+        var urlType = urlSplit[urlSplit.length - 2];
+        var urlName = urlSplit[urlSplit.length - 1];
+        // Get spec JSON
+        chrome.storage.local.get('globalConfig', function (it) {
+            chrome.storage.local.get('spec', function (items) {
+                specJson = items.spec;
+                // If spec enabled, change spec. Change global otherwise
+                if (specJson[urlType][urlName].enable) {
+                    specJson[urlType][urlName].config.lang = lang;
+                    chrome.storage.local.set({ 'spec': specJson }, function (items) {
+                        // Update buttons
+                        resetButtonsStyle();
+                        // Notify content script to update list
+                        if (it.globalConfig.active) {
+                            notifyUpdate("lang");
+                        }
+                    });
+                } else {
+                    it.globalConfig.lang = lang;
+                    chrome.storage.local.set({ 'globalConfig': it.globalConfig }, function (items) {
+                        // Update buttons
+                        resetButtonsStyle();
+                        // Notify content script to update list
+                        if (it.globalConfig.active) {
+                            notifyUpdate("lang");
+                        }
+                    });
+
+                }
+            });
         });
     });
 };
 
 // Update subs
 function changeSubs(subs) {
-    chrome.storage.local.get('globalConfig', function (it) {
-        it.globalConfig.subs = subs;
-        chrome.storage.local.set({ 'globalConfig': it.globalConfig }, function (items) {
-            // Update buttons
-            resetButtonsStyle();
-            // Notify content script to update list
-            notifyUpdate("subtitles");
+    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+        // Get peli/serie name
+        var url = tabs[0].url;
+        var urlSplit = url.split("/");
+        var urlType = urlSplit[urlSplit.length - 2];
+        var urlName = urlSplit[urlSplit.length - 1];
+        // Get spec JSON
+        chrome.storage.local.get('globalConfig', function (it) {
+            chrome.storage.local.get('spec', function (items) {
+                specJson = items.spec;
+                // If spec enabled, change spec. Change global otherwise
+                if (specJson[urlType][urlName].enable) {
+                    specJson[urlType][urlName].config.subs = subs;
+                    chrome.storage.local.set({ 'spec': specJson }, function (items) {
+                        // Update buttons
+                        resetButtonsStyle();
+                        // Notify content script to update list
+                        if (it.globalConfig.active) {
+                            notifyUpdate("subs");
+                        }
+                    });
+                } else {
+                    it.globalConfig.subs = subs;
+                    chrome.storage.local.set({ 'globalConfig': it.globalConfig }, function (items) {
+                        // Update buttons
+                        resetButtonsStyle();
+                        // Notify content script to update list
+                        if (it.globalConfig.active) {
+                            notifyUpdate("subs");
+                        }
+                    });
+
+                }
+            });
         });
     });
 };
@@ -145,95 +226,145 @@ function resetButtonsStyle() {
     document.getElementById('subs-eng-button').className = "button";
     document.getElementById('subs-none-button').className = "button";
 
+    document.getElementById('sync-obj').contentDocument.getElementById('sync-svg').className = "sync-enable";
+
     initButtons();
 }
 
 // Initialisation
 function initButtons() {
-    chrome.storage.local.get('globalConfig', function (it) {
-        // First time it wont exist
-        if (it.globalConfig == undefined) { it.globalConfig = {}; }
+    // Check if specific config enabled
+    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+        // Get peli/serie name
+        var url = tabs[0].url;
+        var urlSplit = url.split("/");
+        var urlType = urlSplit[urlSplit.length - 2];
+        var urlName = urlSplit[urlSplit.length - 1];
+        // Get spec JSON
+        chrome.storage.local.get('spec', function (items) {
+            // Use gloabl config
+            chrome.storage.local.get('globalConfig', function (it) {
+                // First time it wont exist
+                if (it.globalConfig == undefined) { it.globalConfig = {}; }
 
-        // If its not defined, changeActive will set it to true
-        if (it.globalConfig.active == undefined) {
-            changeActive();
-            it.globalConfig.active = true;
-        }
+                // If its not defined, changeActive will set it to true
+                if (it.globalConfig.active == undefined) {
+                    changeActive();
+                    it.globalConfig.active = true;
+                }
 
-        // Set state
-        document.getElementById('myonoffswitch').checked = it.globalConfig.active;
+                // Set state
+                document.getElementById('myonoffswitch').checked = it.globalConfig.active;
 
-        // Set transition once initial value assigned
-        // Little hack: Wait 250ms, enough for HTML to load. This way we avoid switches visually updating on every load.
-        setTimeout(function () { document.getElementById('myonoffswitch-label').classList.add('onoffswitch-label-anim'); }, 250);
+                // Set transition once initial value assigned
+                // Little hack: Wait 250ms, enough for HTML to load. This way we avoid switches visually updating on every load.
+                setTimeout(function () { document.getElementById('myonoffswitch-label').classList.add('onoffswitch-label-anim'); }, 250);
+                if (items.spec[urlType][urlName] != undefined && items.spec[urlType][urlName].enable) {
+                    setButtonStyles(it.globalConfig.active, items.spec[urlType][urlName].config.quality, items.spec[urlType][urlName].config.lang, items.spec[urlType][urlName].config.subs, true);
+                } else {
+                    setButtonStyles(it.globalConfig.active, it.globalConfig.quality, it.globalConfig.lang, it.globalConfig.subs, false);
+                }
+            });
 
-        // Retrieve quality and set button style
-        switch (it.globalConfig.quality) {
-            case 'any':
-                document.getElementById('qua-any-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            case 'quality-0':
-                document.getElementById('qua-low-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            case 'quality-1':
-                document.getElementById('qua-high-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            case 'quality-2':
-                document.getElementById('qua-hd-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            default:
-                break;
-        }
 
-        // Retrieve lang and set button style
-        switch (it.globalConfig.lang) {
-            case 'any':
-                document.getElementById('lang-any-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            case 'esp':
-                document.getElementById('lang-esp-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            case 'eng':
-                document.getElementById('lang-eng-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            case 'lat':
-                document.getElementById('lang-lat-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            default:
-                break;
-        }
-
-        // Retrieve subs and set button style
-        switch (it.globalConfig.subs) {
-            case 'any':
-                document.getElementById('subs-any-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            case 'esp':
-                document.getElementById('subs-esp-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            case 'eng':
-                document.getElementById('subs-eng-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            case 'none':
-                document.getElementById('subs-none-button').classList.add(it.globalConfig.active ? "button-selected" : "button-selected-unactive");
-                break;
-            default:
-                break;
-        }
+        });
     });
 }
 
+// Set button styles
+function setButtonStyles(active, quality, lang, subs, spec) {
+    // Retrieve quality and set button style
+    switch (quality) {
+        case 'any':
+            document.getElementById('qua-any-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        case 'quality-0':
+            document.getElementById('qua-low-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        case 'quality-1':
+            document.getElementById('qua-high-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        case 'quality-2':
+            document.getElementById('qua-hd-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        default:
+            break;
+    }
+
+    // Retrieve lang and set button style
+    switch (lang) {
+        case 'any':
+            document.getElementById('lang-any-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        case 'esp':
+            document.getElementById('lang-esp-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        case 'eng':
+            document.getElementById('lang-eng-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        case 'lat':
+            document.getElementById('lang-lat-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        default:
+            break;
+    }
+
+    // Retrieve subs and set button style
+    switch (subs) {
+        case 'any':
+            document.getElementById('subs-any-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        case 'esp':
+            document.getElementById('subs-esp-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        case 'eng':
+            document.getElementById('subs-eng-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        case 'none':
+            document.getElementById('subs-none-button').classList.add(active ? "button-selected" : "button-selected-unactive");
+            break;
+        default:
+            break;
+    }
+
+    // If enabled set to grey, colored otherwise
+    if (spec) {
+        document.getElementById('sync-obj').contentDocument.getElementById('sync-svg').style = "fill: #aaa; cursor: pointer;";
+    } else {
+        document.getElementById('sync-obj').contentDocument.getElementById('sync-svg').style = "fill: #f96805; cursor: pointer;";
+    }
+}
+
+
 // Initial config
 document.addEventListener('DOMContentLoaded', function () {
-    // Button configuration
-    chrome.storage.local.get('globalConfig', function (items) {
-        if (items.globalConfig == undefined) {
+    // Storage initialisation and button configuration
+    chrome.storage.local.get('globalConfig', function (it) {
+        if (it.globalConfig == undefined) {
             // Initialise values
-            chrome.storage.local.set({ 'globalConfig': {'active': true, 'quality': 'any', 'lang': 'any', 'subs': 'any'} }, function (items) {
-                initButtons();
+            chrome.storage.local.set({ 'globalConfig': { 'active': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' } }, function (itm) {
+                chrome.storage.local.get('spec', function (items) {
+                    if (items.spec == undefined) {
+                        items.spec = { 'serie': {}, 'peli': {} };
+                        chrome.storage.local.set({ 'spec': items.spec }, function (itemsSpec) {
+                            initButtons();
+                        });
+                    } else {
+                        initButtons();
+                    }
+                });
             });
         } else {
-            initButtons();
+            chrome.storage.local.get('spec', function (items) {
+                if (items.spec == undefined) {
+                    items.spec = { 'serie': {}, 'peli': {} };
+                    chrome.storage.local.set({ 'spec': items.spec }, function (itemsSpec) {
+                        initButtons();
+                    });
+                } else {
+                    initButtons();
+                }
+            });
         }
     });
 
