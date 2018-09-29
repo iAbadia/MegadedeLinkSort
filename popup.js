@@ -41,6 +41,60 @@ function changeActive() {
     });
 }
 
+// Update Sync state
+function changeSync() {
+    chrome.tabs.query({ 'active': true, 'lastFocusedWindow': true }, function (tabs) {
+        // Get peli/serie name
+        var url = tabs[0].url;
+        var urlSplit = url.split("/");
+        var urlType = urlSplit[urlSplit.length - 2];
+        var urlName = urlSplit[urlSplit.length - 1];
+        // Get sync JSON
+        chrome.storage.local.get('sync', function (items) {
+            console.log(items.sync);
+            var syncJson = items.sync == undefined ? { 'serie': {}, 'peli': {} } : items.sync;
+            // Create serie/peli obj if undefined
+            if (syncJson[urlType][urlName] == undefined) { syncJson[urlType][urlName] = {}; }
+            // New value for sync
+            var newVal = !(syncJson[urlType][urlName].enable == undefined || syncJson[urlType][urlName].enable);
+            syncJson[urlType][urlName].enable = newVal;
+            // If no set config, set global (Callback Hell...)
+            if (syncJson[urlType][urlName].config == undefined) {
+                syncJson[urlType][urlName].config = {};
+                chrome.storage.local.get('active', function (it) {
+                    syncJson[urlType][urlName].config.active = it.active;
+                    chrome.storage.local.get('quality', function (itemsQuality) {
+                        syncJson[urlType][urlName].config.quality = itemsQuality.quality;
+                        chrome.storage.local.get('lang', function (itemsLang) {
+                            syncJson[urlType][urlName].config.lang = itemsLang.lang;
+                            chrome.storage.local.get('subs', function (itemsSubs) {
+                                syncJson[urlType][urlName].config.subs = itemsSubs.subs;
+                                // Save new JSON
+                                chrome.storage.local.set({ 'sync': syncJson }, function (items) {
+                                    // Update buttons
+                                    resetButtonsStyle();
+                                    // Notify content script to update list (only when disabling)
+                                    // When enabling the content script will kick in in less than 1sec
+                                    notifyUpdate("sync");
+                                });
+                            });
+                        });
+                    });
+                });
+            } else {
+                // Save new JSON
+                chrome.storage.local.set({ 'sync': syncJson }, function (items) {
+                    // Update buttons
+                    resetButtonsStyle();
+                    // Notify content script to update list (only when disabling)
+                    // When enabling the content script will kick in in less than 1sec
+                    notifyUpdate("sync");
+                });
+            }
+        });
+    });
+}
+
 // Update quality
 function changeQuality(quality) {
     chrome.storage.local.set({ 'quality': quality }, function (items) {
@@ -186,6 +240,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Set click listeners
     document.getElementById('myonoffswitch').addEventListener("click", function () { changeActive() });
+    document.getElementById('sync-obj').onload = function() {   // Wait for Object to load svg to set the click listener
+        document.getElementById('sync-obj').contentDocument.getElementById('sync-svg').addEventListener("click", function () { changeSync() });
+    }
 
     document.getElementById('qua-any-button').addEventListener("click", function () { changeQuality("any") });
     document.getElementById('qua-low-button').addEventListener("click", function () { changeQuality("quality-0") });

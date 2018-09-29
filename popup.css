@@ -30,7 +30,7 @@ body {
 }
 
 .button-selected {
-    border: 1px solid #910101 !important;
+    border: 1px solid #f96805 !important;
     padding: 8px 0;
     text-align: center;
     text-decoration: none;
@@ -42,7 +42,7 @@ body {
     /* Safari */
     transition-duration: 0.4s;
     cursor: pointer;
-    background-color: #af0806 !important;
+    background-color: #fb7a22 !important;
     color: white;
 }
 
@@ -148,11 +148,17 @@ body {
     transition: all 0.3s ease-in 0s;
 } 
 .onoffswitch-checkbox:checked + .onoffswitch-label {
-    background-color: #af0806;
+    background-color: #fb7a22;
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label, .onoffswitch-checkbox:checked + .onoffswitch-label:before {
-   border-color: #910101;
+   border-color: #f96805;
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label:before {
     right: 0px; 
+}
+
+#sync-obj {
+    right: -40px;
+    position: absolute;
+    top: 5px;
 }
