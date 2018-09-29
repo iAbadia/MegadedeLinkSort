@@ -102,7 +102,7 @@ function changeQuality(quality) {
             chrome.storage.local.get('spec', function (items) {
                 specJson = items.spec;
                 // If spec enabled, change spec. Change global otherwise
-                if (specJson[urlType][urlName].enable) {
+                if (specJson[urlType][urlName] != undefined && specJson[urlType][urlName].enable) {
                     specJson[urlType][urlName].config.quality = quality;
                     chrome.storage.local.set({ 'spec': specJson }, function (items) {
                         // Update buttons
@@ -142,7 +142,7 @@ function changeLang(lang) {
             chrome.storage.local.get('spec', function (items) {
                 specJson = items.spec;
                 // If spec enabled, change spec. Change global otherwise
-                if (specJson[urlType][urlName].enable) {
+                if (specJson[urlType][urlName] != undefined && specJson[urlType][urlName].enable) {
                     specJson[urlType][urlName].config.lang = lang;
                     chrome.storage.local.set({ 'spec': specJson }, function (items) {
                         // Update buttons
@@ -182,7 +182,7 @@ function changeSubs(subs) {
             chrome.storage.local.get('spec', function (items) {
                 specJson = items.spec;
                 // If spec enabled, change spec. Change global otherwise
-                if (specJson[urlType][urlName].enable) {
+                if (specJson[urlType][urlName] != undefined && specJson[urlType][urlName].enable) {
                     specJson[urlType][urlName].config.subs = subs;
                     chrome.storage.local.set({ 'spec': specJson }, function (items) {
                         // Update buttons

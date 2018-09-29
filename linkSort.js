@@ -123,10 +123,8 @@ function clearSortedLinksSection(type) {
 
 // Type must be 'online' or 'download' (Online/Download link list IDs)
 function sortLinks(type) {
-    console.log("sortLinks");
     // Retrieve selected quality, lang and subs.
     if (displayedLinks()) {
-        console.log("displayed");
         // Get peli/serie name
         var urlSplit = window.location.pathname.split('/');
         var urlType = urlSplit[urlSplit.length - 2];
