@@ -1,8 +1,8 @@
 // Initial config
-chrome.storage.local.get('initconfig', function (items) {
-    if (items.initconfig == undefined) {
+chrome.storage.local.get('globalConfig', function (items) {
+    if (items.globalConfig == undefined) {
         // Initialise values
-        chrome.storage.local.set({ 'initconfig': true, 'quality': 'any', 'lang': 'any', 'subs': 'any' }, function () {
+        chrome.storage.local.set({ 'globalConfig': {'active': true, 'quality': 'any', 'lang': 'any', 'subs': 'any'} }, function (items) {
             // Start checkLinks loop
             setInterval(checkLinks, 1000);
         });
@@ -108,10 +108,10 @@ function clearSortedLinksSection(type) {
 function sortLinks(type) {
     // Retrieve selected quality, lang and subs.
     if (displayedLinks()) {
-        chrome.storage.local.get(['quality', 'lang', 'subs'], function (items) {
-            linkQuality = items.quality;
-            linkLang = items.lang;
-            linkSubs = items.subs;
+        chrome.storage.local.get('globalConfig', function (items) {
+            linkQuality = items.globalConfig.quality;
+            linkLang = items.globalConfig.lang;
+            linkSubs = items.globalConfig.subs;
 
             // Get sorted links container
             var linksContainer = document.getElementById(type);
@@ -176,8 +176,8 @@ function sortLinks(type) {
 
 // Remove sorted links
 function clearSortedLinks(type) {
-    chrome.storage.local.get('active', function (items) {
-        if (items.active == undefined || items.active) {
+    chrome.storage.local.get('globalConfig', function (items) {
+        if (items.globalConfig.active == undefined || items.globalConfig.active) {
             // Check if links loaded
             if (displayedLinks()) {
                 // Check if already sorted
@@ -198,8 +198,8 @@ function checkLinks() {
     // Check if links are displayed
     if (displayedLinks()) {
         // Check if sorting active
-        chrome.storage.local.get('active', function (items) {
-            if (items.active == undefined || items.active) {
+        chrome.storage.local.get('globalConfig', function (items) {
+            if (items.globalConfig.active == undefined || items.globalConfig.active) {
                 // Check if already sorted
                 if (document.getElementById('pls-title-sorted-links-online') == null) { // Could test for either online or download
                     // Sort links
