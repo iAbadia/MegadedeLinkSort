@@ -1,8 +1,10 @@
 // Notify update to content-script
+var DOMAIN = "www.megadede.com";
+var PROTOCOL = "https://";
 var notifyUpdate;   // Will be assigned to one of the vendor-specific functions
 // Chrome-specific notify function
 function notifyUpdateChrome(msg) {
-    chrome.tabs.query({ url: "https://www.megadede.com/*" }, function (tabs) {
+    chrome.tabs.query({ url: PROTOCOL + DOMAIN + "/*" }, function (tabs) {
         if (tabs.length > 0) {
             for (let i = 0; i < tabs.length; i++) {
                 chrome.tabs.sendMessage(tabs[i].id, { action: msg });
@@ -47,6 +49,7 @@ function changeSync() {
         // Get peli/serie name
         var url = tabs[0].url;
         var urlSplit = url.split("/");
+        var urlDomain = urlSplit[urlSplit.length - 3];
         var urlType = urlSplit[urlSplit.length - 2];
         var urlName = urlSplit[urlSplit.length - 1];
         // Get spec JSON
@@ -58,7 +61,7 @@ function changeSync() {
             var newVal = specJson[urlType][urlName].enable == undefined || !specJson[urlType][urlName].enable;
             specJson[urlType][urlName].enable = newVal;
             // If no set config, set global
-            if (specJson[urlType][urlName].config == undefined) {
+            if (urlDomain == DOMAIN && specJson[urlType][urlName].config == undefined) {
                 specJson[urlType][urlName].config = {};
                 chrome.storage.local.get('globalConfig', function (it) {
                     specJson[urlType][urlName].config.quality = it.globalConfig.quality;
@@ -95,6 +98,7 @@ function changeQuality(quality) {
         // Get peli/serie name
         var url = tabs[0].url;
         var urlSplit = url.split("/");
+        var urlDomain = urlSplit[urlSplit.length - 3];
         var urlType = urlSplit[urlSplit.length - 2];
         var urlName = urlSplit[urlSplit.length - 1];
         // Get spec JSON
@@ -102,7 +106,7 @@ function changeQuality(quality) {
             chrome.storage.local.get('spec', function (items) {
                 specJson = items.spec;
                 // If spec enabled, change spec. Change global otherwise
-                if (specJson[urlType][urlName] != undefined && specJson[urlType][urlName].enable) {
+                if (urlDomain == DOMAIN && specJson[urlType][urlName] != undefined && specJson[urlType][urlName].enable) {
                     specJson[urlType][urlName].config.quality = quality;
                     chrome.storage.local.set({ 'spec': specJson }, function (items) {
                         // Update buttons
@@ -135,6 +139,7 @@ function changeLang(lang) {
         // Get peli/serie name
         var url = tabs[0].url;
         var urlSplit = url.split("/");
+        var urlDomain = urlSplit[urlSplit.length - 3];
         var urlType = urlSplit[urlSplit.length - 2];
         var urlName = urlSplit[urlSplit.length - 1];
         // Get spec JSON
@@ -142,7 +147,7 @@ function changeLang(lang) {
             chrome.storage.local.get('spec', function (items) {
                 specJson = items.spec;
                 // If spec enabled, change spec. Change global otherwise
-                if (specJson[urlType][urlName] != undefined && specJson[urlType][urlName].enable) {
+                if (urlDomain == DOMAIN && specJson[urlType][urlName] != undefined && specJson[urlType][urlName].enable) {
                     specJson[urlType][urlName].config.lang = lang;
                     chrome.storage.local.set({ 'spec': specJson }, function (items) {
                         // Update buttons
@@ -175,6 +180,7 @@ function changeSubs(subs) {
         // Get peli/serie name
         var url = tabs[0].url;
         var urlSplit = url.split("/");
+        var urlDomain = urlSplit[urlSplit.length - 3];
         var urlType = urlSplit[urlSplit.length - 2];
         var urlName = urlSplit[urlSplit.length - 1];
         // Get spec JSON
@@ -182,7 +188,7 @@ function changeSubs(subs) {
             chrome.storage.local.get('spec', function (items) {
                 specJson = items.spec;
                 // If spec enabled, change spec. Change global otherwise
-                if (specJson[urlType][urlName] != undefined && specJson[urlType][urlName].enable) {
+                if (urlDomain == DOMAIN && specJson[urlType][urlName] != undefined && specJson[urlType][urlName].enable) {
                     specJson[urlType][urlName].config.subs = subs;
                     chrome.storage.local.set({ 'spec': specJson }, function (items) {
                         // Update buttons
@@ -238,6 +244,7 @@ function initButtons() {
         // Get peli/serie name
         var url = tabs[0].url;
         var urlSplit = url.split("/");
+        var urlDomain = urlSplit[urlSplit.length - 3];
         var urlType = urlSplit[urlSplit.length - 2];
         var urlName = urlSplit[urlSplit.length - 1];
         // Get spec JSON
@@ -259,7 +266,7 @@ function initButtons() {
                 // Set transition once initial value assigned
                 // Little hack: Wait 250ms, enough for HTML to load. This way we avoid switches visually updating on every load.
                 setTimeout(function () { document.getElementById('myonoffswitch-label').classList.add('onoffswitch-label-anim'); }, 250);
-                if (items.spec[urlType][urlName] != undefined && items.spec[urlType][urlName].enable) {
+                if (urlDomain == DOMAIN && items.spec[urlType][urlName] != undefined && items.spec[urlType][urlName].enable) {
                     setButtonStyles(it.globalConfig.active, items.spec[urlType][urlName].config.quality, items.spec[urlType][urlName].config.lang, items.spec[urlType][urlName].config.subs, true);
                 } else {
                     setButtonStyles(it.globalConfig.active, it.globalConfig.quality, it.globalConfig.lang, it.globalConfig.subs, false);

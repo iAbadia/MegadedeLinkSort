@@ -3,7 +3,7 @@
     "name": "Megadede Link Sort",
     "short_name": "MLS",
     "description": "Megadede Link Sorter",
-    "version": "1.3",
+    "version": "1.4",
     "browser_action": {
         "default_icon": "icon.png",
         "default_title": "MLS",
